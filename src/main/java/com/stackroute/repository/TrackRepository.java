@@ -12,5 +12,5 @@ import org.springframework.stereotype.Repository;
 public interface TrackRepository extends JpaRepository<Track,String>
 {
     @Query("select t from Track t where LOWER(t.trackname)=Lower(:name)")
-    public Track findByTrackName(@Param("name") String name)throws TrackNotFoundExceptions;
+    public Track findByTrackName(String name);
 }

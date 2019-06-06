@@ -32,8 +32,8 @@ public class Trackcontroller {
         this.trackservice=trackservice;
     }
 
-    @PostMapping("save")
-    public ResponseEntity<?> saveUser(@RequestBody Track trackInfo)throws TrackAlreadyExistsExceptions
+    @PostMapping("tracksave")
+    public ResponseEntity<?> saveTrack(@RequestBody Track trackInfo)throws TrackAlreadyExistsExceptions
     {
         ResponseEntity responseEntity;
 
@@ -50,30 +50,29 @@ public class Trackcontroller {
         return new ResponseEntity<List<Track>>(trackservice.getAllTracks(),HttpStatus.OK);
     }
 
-    @PutMapping("update/{id}")
-    public ResponseEntity<?> updateTrack(@RequestBody String id,@PathVariable ("id") String comment)throws  TrackNotFoundExceptions
+    @PutMapping("track/{id}/{comment}")
+    public ResponseEntity<?> updateTrack(@RequestBody  @PathVariable("id") String id,@PathVariable ("comment") String comment)throws  TrackNotFoundExceptions
     {
         ResponseEntity responseEntity;
         Track updatedTrackInfo =null;
 
 
             updatedTrackInfo =trackservice.updateTrack(id,comment);
-            responseEntity=new ResponseEntity<Track>(updatedTrackInfo, HttpStatus.CREATED);
+            responseEntity=new ResponseEntity<Track>(updatedTrackInfo, HttpStatus.OK);
             return responseEntity;
     }
-    @DeleteMapping("delete")
-    public ResponseEntity<?> deleteTrack(@RequestBody String id)throws TrackNotFoundExceptions
+    @DeleteMapping("trackdelete/{id}")
+    public ResponseEntity<?> deleteTrack(@RequestBody @PathVariable("id") String id)throws TrackNotFoundExceptions
     {
         ResponseEntity responseEntity;
         Track deletetrack=null;
 
 
             deletetrack=trackservice.deleteTrack(id);
-            responseEntity=new ResponseEntity<Track>(deletetrack, HttpStatus.CREATED);
-
-        return responseEntity;
+            responseEntity=new ResponseEntity<Track>(deletetrack, HttpStatus.OK);
+            return responseEntity;
     }
-    @PostMapping("search/{id}")
+    @PostMapping("track/{id}")
     public   ResponseEntity<?>   findByTrackName(@PathVariable("id") String name)throws TrackNotFoundExceptions
     {
 
@@ -81,7 +80,7 @@ public class Trackcontroller {
          ResponseEntity responseEntity;
          Track newTrackInfo =null;
          newTrackInfo =trackservice.findByTrackName(name);
-         responseEntity=new ResponseEntity<Track>(newTrackInfo, HttpStatus.CREATED);
+         responseEntity=new ResponseEntity<Track>(newTrackInfo, HttpStatus.OK);
          return responseEntity;
 
     }

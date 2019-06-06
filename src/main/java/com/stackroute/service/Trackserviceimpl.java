@@ -6,19 +6,23 @@ import com.stackroute.exceptions.TrackNotFoundExceptions;
 import com.stackroute.repository.TrackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-@CacheConfig(cacheNames = "music")
+@CacheConfig(cacheNames = {"track"})
 @Service
 @Primary
 public class Trackserviceimpl  implements  Trackservice {
 
     private TrackRepository trackRepository;
+
+    private Track track;
 
     public void simulateDelay()
     {
@@ -37,7 +41,7 @@ public class Trackserviceimpl  implements  Trackservice {
     {
         this.trackRepository=trackRepository;
     }
-    @CachePut
+    @CacheEvict(allEntries = true)
     @Override
     public Track saveTrack(Track trackInfo)throws TrackAlreadyExistsExceptions {
 
@@ -53,7 +57,7 @@ public class Trackserviceimpl  implements  Trackservice {
         return savedtrack;
     }
 
-    @Cacheable
+    @Cacheable(value="track")
     @Override
     public List<Track> getAllTracks() {
 
@@ -62,35 +66,39 @@ public class Trackserviceimpl  implements  Trackservice {
         return tracklist;
     }
 
-    @CachePut
+
+    @CacheEvict(allEntries=true)
     @Override
     public Track updateTrack(String id, String comment)throws TrackNotFoundExceptions
     {
-         Track trackInfo;
-        if (trackRepository.existsById(id))
+        Optional optional=trackRepository.findById(id);
+        if (optional.isPresent())
         {
-            trackInfo =trackRepository.findById(id).get();
-            trackInfo.setTrackcmnt(comment);
-            trackRepository.save(trackInfo);
+            track =trackRepository.findById(id).get();
+            track.setTrackcmnt(comment);
+            trackRepository.save(track);
+
         }
         else
             {
-            throw new TrackNotFoundExceptions("no trackInfo found to update");
+
+                throw new TrackNotFoundExceptions("no trackInfo found to update");
            }
 
 
-        return trackInfo;
+        return track;
     }
 
-    @CachePut
+
     @Override
+    @CacheEvict(allEntries = true)
     public Track deleteTrack(String trackId)throws TrackNotFoundExceptions
     {
-         Track trackInfo =null;
-        if (trackRepository.existsById(trackId))
+        Optional optional=trackRepository.findById(trackId);
+        if (optional.isPresent())
         {
 
-            trackInfo =trackRepository.findById(trackId).get();
+            track =trackRepository.findById(trackId).get();
             trackRepository.deleteById(trackId);
         }
         else
@@ -98,7 +106,7 @@ public class Trackserviceimpl  implements  Trackservice {
 
             throw  new TrackNotFoundExceptions("no trackInfo found to delete");
             }
-        return trackInfo;
+        return track;
 
     }
 
